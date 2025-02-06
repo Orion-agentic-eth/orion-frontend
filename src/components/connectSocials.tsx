@@ -5,16 +5,15 @@ const ConnectSocials = () => {
     const { setActiveStep } = useGlobalStorage();
     const login = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
-            console.log(tokenResponse);
-            const res = await fetch(
-                'https://www.googleapis.com/auth/userinfo.profile',
-                {
-                    headers: {
-                        Authorization: `Bearer ${tokenResponse.access_token}`,
-                    },
-                }
-            );
+            const url =
+                'https://www.googleapis.com/oauth2/v1/userinfo?alt=json';
+            const res = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${tokenResponse.access_token}`,
+                },
+            });
             if (res) {
+                console.log(res);
                 setActiveStep(1);
             }
         },

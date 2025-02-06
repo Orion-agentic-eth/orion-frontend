@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router';
 import { toastStyles } from '../config';
+import useGlobalStorage from '../store';
 export const fetchUserData = async (token: string) => {
     try {
         const res = await fetch(
@@ -63,6 +64,7 @@ export const fetchStats = async (token: string) => {
 export function useFitbitAuth() {
     let [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { setActiveStep } = useGlobalStorage();
     const exchangeToken = async (code: string) => {
         try {
             const codeVerifier = sessionStorage.getItem('code_verifier');
@@ -83,6 +85,7 @@ export function useFitbitAuth() {
             );
             toast.dismiss();
             toast.success('Gear connected successfully', toastStyles);
+            setActiveStep(2);
             return await response.json();
         } catch (err) {
             toast.dismiss();

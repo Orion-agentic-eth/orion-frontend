@@ -55,7 +55,13 @@ function App() {
                 </div>{' '}
                 <div className="flex flex-col md:flex-row items-center py-10 md:py-20 mx-auto container gap-6 md:gap-x-6">
                     <VerticalLinearStepper />
-                    {activeStep === 0 ? <ConnectSocials /> : <ConnectGears />}
+                    {activeStep === 0 ? (
+                        <ConnectSocials />
+                    ) : activeStep === 1 ? (
+                        <ConnectGears />
+                    ) : (
+                        <div>Ready to roll</div>
+                    )}
                 </div>
             </div>
         </div>
