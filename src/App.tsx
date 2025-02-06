@@ -1,9 +1,14 @@
-import Navbar from './components/navbar';
-import AgentInfo from './assets/agent-info.webp';
-import { generateCodeChallenge, generateCodeVerifier } from './lib/helper';
 import { useQuery } from '@tanstack/react-query';
+import AgentInfo from './assets/agent-info.webp';
+
+import ConnectGears from './components/connectGears';
+import Navbar from './components/navbar';
+import VerticalLinearStepper from './components/ui/stepper';
 import { fetchUserData, useFitbitAuth } from './hooks/useFitbitAuth';
+import React from 'react';
+import ConnectSocials from './components/connectSocials';
 function App() {
+    const [activeStep, setActiveStep] = React.useState(0);
     useFitbitAuth();
     const sessionCode = sessionStorage.getItem('fitbit_token');
     const { data } = useQuery({
@@ -11,41 +16,50 @@ function App() {
         queryFn: () => fetchUserData(sessionCode!),
         enabled: !!sessionCode,
     });
-    const handleGetFitRedirection = async () => {
-        const verifier = generateCodeVerifier();
-        const challenge = await generateCodeChallenge(verifier);
-        sessionStorage.setItem('code_verifier', verifier);
-        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23Q6F6&scope=activity+cardio_fitness+electrocardiogram+heartrate+irregular_rhythm_notifications+location+nutrition+oxygen_saturation+profile+respiratory_rate+settings+sleep+social+temperature+weight&code_challenge=${challenge}&code_challenge_method=S256`;
-    };
-    console.log(data);
-    return (
-        <div className="relative font-orbitron ">
-            <Navbar />
 
-            <div className="relative z-10 pt-12   text-center w-xl mx-auto">
-                <div className="text-3xl font-semibold leading-normal">
+    console.log(data);
+
+    return (
+        <div className="relative font-orbitron min-h-screen flex flex-col items-center px-4 md:px-8">
+            <Navbar />
+            <div className="relative z-10 pt-12 text-center max-w-2xl w-full">
+                <div className="text-2xl md:text-3xl font-semibold leading-snug">
                     Your Personal AI Agent for Fitness, Scheduling & Investing
                 </div>
-                <div className="py-7">
+                <p className="py-5 md:py-10 text-sm md:text-base">
                     Orion simplifies your life with AI-driven solutions,
                     optimizing your health, time, and finances effortlessly.
-                </div>
+                </p>
                 <button className="bg-gradient-to-r from-orange-600/90 to-orange-700 text-sm font-medium text-white py-2 px-4 rounded-lg hover:from-orange-600 hover:to-orange-700">
                     Launch your agent
                 </button>
             </div>
-            <div className="absolute top-0">
-                <img src={AgentInfo} alt="agent-info" />
-                <div className="text-3xl font-bold pb-10 absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 bottom-0">
-                    Launch your Agent
-                </div>
-                <div
-                    className="py-4 flex items-center justify-center w-full flex-col"
-                    onClick={handleGetFitRedirection}
-                >
-                    <div className="h-fit w-full md:w-fit mx-auto mt-3 cursor-pointer">
-                        Connect Gear
+            <div className="relative w-full flex flex-col items-center mt-5 md:mt-8">
+                <img
+                    src={AgentInfo}
+                    alt="agent-info"
+                    className="w-full  md:-mt-[250px]"
+                />
+                <div className="md:-mt-[100px]">
+                    <div className="text-xl md:text-3xl font-bold text-center">
+                        Launch your Agent
                     </div>
+
+                    <div className="text-center text-sm md:text-xl pt-5 md:pt-20 text-white">
+                        Connect Your Socials – Stay Synced with Orion
+                    </div>
+                    <p className="text-[11px] md:text-sm max-w-3xl leading-loose py-5 text-center">
+                        Enhance Orion’s AI capabilities by linking your favorite
+                        platforms for smarter recommendations, seamless
+                        scheduling, and a truly personalized experience.
+                    </p>
+                </div>{' '}
+                <div className="flex flex-col md:flex-row items-center py-10 md:py-20 mx-auto container gap-6 md:gap-x-6">
+                    <VerticalLinearStepper
+                        activeStep={activeStep}
+                        setActiveStep={setActiveStep}
+                    />
+                    {activeStep === 0 ? <ConnectSocials /> : <ConnectGears />}
                 </div>
             </div>
         </div>

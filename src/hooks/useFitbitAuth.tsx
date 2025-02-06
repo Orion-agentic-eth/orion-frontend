@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router';
+import { toastStyles } from '../config';
 export const fetchUserData = async (token: string) => {
     try {
         const res = await fetch(
@@ -15,7 +17,6 @@ export const fetchUserData = async (token: string) => {
         }
 
         const data = await res.json();
-
         return data?.user;
     } catch (err) {
         console.error('Error fetching user data:', err);
@@ -80,9 +81,12 @@ export function useFitbitAuth() {
                     }),
                 }
             );
-
+            toast.dismiss();
+            toast.success('Gear connected successfully', toastStyles);
             return await response.json();
         } catch (err) {
+            toast.dismiss();
+            toast.error('Failed to connect gear', toastStyles);
             console.error('Error exchanging token:', err);
         }
     };
