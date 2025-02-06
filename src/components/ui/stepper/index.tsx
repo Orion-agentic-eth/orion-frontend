@@ -1,12 +1,10 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
-import Stepper from '@mui/material/Stepper';
+import Paper from '@mui/material/Paper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import StepContent from '@mui/material/StepContent';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
+import Stepper from '@mui/material/Stepper';
 import Typography from '@mui/material/Typography';
+import useGlobalStorage from '../../../store';
 
 const steps = [
     {
@@ -20,17 +18,8 @@ const steps = [
     },
 ];
 
-export default function VerticalLinearStepper({
-    activeStep,
-    setActiveStep,
-}: {
-    activeStep: number;
-    setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-}) {
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    };
-
+export default function VerticalLinearStepper() {
+    const { activeStep } = useGlobalStorage();
     return (
         <Box>
             <Stepper activeStep={activeStep} orientation="vertical">
@@ -50,19 +39,6 @@ export default function VerticalLinearStepper({
                                 {step.label}
                             </Typography>
                         </StepLabel>
-                        <StepContent>
-                            <Box sx={{ mb: 2 }}>
-                                <Button
-                                    variant="contained"
-                                    onClick={handleNext}
-                                    sx={{ mt: 1, mr: 1 }}
-                                >
-                                    {index === steps.length - 1
-                                        ? 'Finish'
-                                        : 'Continue'}
-                                </Button>
-                            </Box>
-                        </StepContent>
                     </Step>
                 ))}
             </Stepper>

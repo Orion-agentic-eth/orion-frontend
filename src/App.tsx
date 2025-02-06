@@ -2,13 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import AgentInfo from './assets/agent-info.webp';
 
 import ConnectGears from './components/connectGears';
+import ConnectSocials from './components/connectSocials';
 import Navbar from './components/navbar';
 import VerticalLinearStepper from './components/ui/stepper';
 import { fetchUserData, useFitbitAuth } from './hooks/useFitbitAuth';
-import React from 'react';
-import ConnectSocials from './components/connectSocials';
+import useGlobalStorage from './store';
 function App() {
-    const [activeStep, setActiveStep] = React.useState(0);
     useFitbitAuth();
     const sessionCode = sessionStorage.getItem('fitbit_token');
     const { data } = useQuery({
@@ -16,7 +15,7 @@ function App() {
         queryFn: () => fetchUserData(sessionCode!),
         enabled: !!sessionCode,
     });
-
+    const { activeStep } = useGlobalStorage();
     console.log(data);
 
     return (
@@ -55,10 +54,7 @@ function App() {
                     </p>
                 </div>{' '}
                 <div className="flex flex-col md:flex-row items-center py-10 md:py-20 mx-auto container gap-6 md:gap-x-6">
-                    <VerticalLinearStepper
-                        activeStep={activeStep}
-                        setActiveStep={setActiveStep}
-                    />
+                    <VerticalLinearStepper />
                     {activeStep === 0 ? <ConnectSocials /> : <ConnectGears />}
                 </div>
             </div>

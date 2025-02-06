@@ -1,5 +1,24 @@
+import { useGoogleLogin } from '@react-oauth/google';
 import GoogleIcon from '../assets/google.png';
+import useGlobalStorage from '../store';
 const ConnectSocials = () => {
+    const { setActiveStep } = useGlobalStorage();
+    const login = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            console.log(tokenResponse);
+            const res = await fetch(
+                'https://www.googleapis.com/auth/userinfo.profile',
+                {
+                    headers: {
+                        Authorization: `Bearer ${tokenResponse.access_token}`,
+                    },
+                }
+            );
+            if (res) {
+                setActiveStep(1);
+            }
+        },
+    });
     return (
         <div className="border border-[#79DFED] rounded-xl h-full w-full md:size-[400px] mx-4 md:ml-20 text-center md:text-left">
             <img
@@ -17,7 +36,10 @@ const ConnectSocials = () => {
                     Sync your calendar and preferences for effortless
                     scheduling.
                 </p>{' '}
-                <button className="border border-[#FF5800] p-2 rounded-lg w-full md:w-auto">
+                <button
+                    className="border border-[#FF5800] p-2 rounded-lg w-full md:w-auto cursor-pointer"
+                    onClick={() => login()}
+                >
                     Connect Now
                 </button>
             </div>
