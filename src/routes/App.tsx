@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import AgentInfo from './assets/agent-info.webp';
+import AgentInfo from '../assets/agent-info.webp';
 
-import ConnectGears from './components/connectGears';
-import ConnectSocials from './components/connectSocials';
-import Navbar from './components/navbar';
-import VerticalLinearStepper from './components/ui/stepper';
-import { fetchUserData, useFitbitAuth } from './hooks/useFitbitAuth';
-import useGlobalStorage from './store';
+import ConnectGears from '../components/connectGears';
+import ConnectSocials from '../components/connectSocials';
+import Navbar from '../components/navbar';
+import VerticalLinearStepper from '../components/ui/stepper';
+import { fetchUserData, useFitbitAuth } from '../hooks/useFitbitAuth';
+import useGlobalStorage from '../store';
+import { Link } from 'react-router';
 function App() {
     useFitbitAuth();
     const sessionCode = sessionStorage.getItem('fitbit_token');
@@ -60,7 +61,12 @@ function App() {
                     ) : activeStep === 1 ? (
                         <ConnectGears />
                     ) : (
-                        <div>Ready to roll</div>
+                        <Link
+                            to={'/your-agent'}
+                            className="border p-2 cursor-pointer"
+                        >
+                            Ready to roll
+                        </Link>
                     )}
                 </div>
             </div>
