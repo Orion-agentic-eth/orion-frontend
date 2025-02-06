@@ -110,7 +110,7 @@ function ChatInputTextArea({
             onChange={onChange}
             onKeyDown={handleKeyDown}
             className={clsx(
-                'max-h-[400px] min-h-0 resize-none overflow-x-hidden',
+                'h-full focus:outline-none resize-none overflow-x-hidden w-full',
                 variant === 'unstyled' &&
                     'border-none focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none',
                 className

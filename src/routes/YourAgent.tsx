@@ -9,7 +9,8 @@ import {
     ChatInputSubmit,
     ChatInputTextArea,
 } from '../components/ui/chat/input';
-const messages = [
+import Navbar from '../components/navbar';
+const messagesContent = [
     {
         id: '1',
         content: 'Hey how are you?',
@@ -29,15 +30,23 @@ const messages = [
 const YourAgent = () => {
     const [value, setValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
+    const [messages, setMessages] = useState(messagesContent);
     const handleSubmit = () => {
         setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 1000);
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: String(prev.length + 1),
+                content: value,
+                type: 'user',
+            },
+        ]);
+        setIsLoading(false);
+        setValue('');
     };
     return (
-        <div className="py-10 space-y-4 container mx-auto">
+        <div className="space-y-4 container mx-auto">
+            <Navbar />
             {messages.map((message) => (
                 <ChatMessage
                     key={message.id}
