@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Navbar from '../components/navbar';
 import {
     ChatMessage,
     ChatMessageAvatar,
@@ -9,28 +10,63 @@ import {
     ChatInputSubmit,
     ChatInputTextArea,
 } from '../components/ui/chat/input';
-import Navbar from '../components/navbar';
-const messagesContent = [
-    {
-        id: '1',
-        content: 'Hey how are you?',
-        type: 'user',
-    },
-    {
-        id: '2',
-        content: "I'm fine, thanks for asking!",
-        type: 'assistant',
-    },
-    {
-        id: '3',
-        content: 'Great!',
-        type: 'user',
-    },
-];
+import { scheduleEvent } from '../lib/helper';
+
 const YourAgent = () => {
     const [value, setValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [messages, setMessages] = useState(messagesContent);
+    const [messages, setMessages] = useState([
+        {
+            id: '1',
+            content: 'Hey how are you?',
+            type: 'user',
+        },
+        {
+            id: '2',
+            content: "I'm fine, thanks for asking!",
+            type: 'assistant',
+        },
+        {
+            id: '3',
+            content: 'Great!',
+            type: 'user',
+        },
+        {
+            id: '4',
+            content: 'Do you want to schedule it on calendar',
+            type: 'assistant',
+        },
+        {
+            id: '5',
+            content: (
+                <div>
+                    <button
+                        onClick={async () => {
+                            const res = await scheduleEvent();
+                            setMessages((prev) => [
+                                ...prev,
+                                {
+                                    id: String(prev.length + 1),
+                                    content: res,
+                                    type: 'assistant',
+                                },
+                            ]);
+                        }}
+                        className="px-4 py-1 bg-[#79DFED] text-black cursor-pointer rounded m-2"
+                    >
+                        Yes
+                    </button>
+                    <button
+                        onClick={() => console.log('No clicked')}
+                        className="px-4 py-1 bg-[#FF5800] text-white rounded m-2 cursor-pointer"
+                    >
+                        No
+                    </button>
+                </div>
+            ),
+            type: 'user',
+        },
+    ]);
     const handleSubmit = () => {
         setIsLoading(true);
         setMessages((prev) => [

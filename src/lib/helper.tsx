@@ -1,3 +1,6 @@
+import toast from 'react-hot-toast';
+import { toastStyles } from '../config';
+
 export const generateCodeVerifier = (): string => {
     const array = new Uint8Array(64);
     crypto.getRandomValues(array);
@@ -24,4 +27,47 @@ export const generateCodeChallenge = async (
 ): Promise<string> => {
     const hashedBuffer = await sha256(codeVerifier);
     return base64UrlEncode(hashedBuffer);
+};
+export const scheduleEvent = async () => {
+    const token = localStorage.getItem('googleAuth');
+
+    const event = {
+        summary: 'Scheduled Call',
+        start: {
+            dateTime: new Date().toISOString(),
+            timeZone: 'Asia/Kolkata',
+        },
+        end: {
+            dateTime: new Date(new Date().getTime() + 30 * 60000).toISOString(),
+            timeZone: 'Asia/Kolkata',
+        },
+    };
+
+    try {
+        const response = await fetch(
+            'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(event),
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.ok && data.htmlLink) {
+            toast.success(`Event Scheduled successfully`, toastStyles);
+            return data.htmlLink;
+        } else {
+            return toast.error(
+                `Failed to schedule event: ${data.error?.message}`,
+                toastStyles
+            );
+        }
+    } catch (error) {
+        toast.error('Error scheduling event:', toastStyles);
+    }
 };

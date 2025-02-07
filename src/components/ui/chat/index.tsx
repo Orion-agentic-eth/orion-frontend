@@ -169,7 +169,7 @@ const chatMessageContentVariants = cva('flex flex-col gap-2', {
 
 interface ChatMessageContentProps extends React.HTMLAttributes<HTMLDivElement> {
     id?: string;
-    content: string;
+    content: any;
 }
 
 const ChatMessageContent = React.forwardRef<
@@ -180,7 +180,6 @@ const ChatMessageContent = React.forwardRef<
 
     const variant = context?.variant ?? 'default';
     const type = context?.type ?? 'incoming';
-
     return (
         <div
             ref={ref}

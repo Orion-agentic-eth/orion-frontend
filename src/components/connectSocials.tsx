@@ -11,6 +11,7 @@ const ConnectSocials = () => {
     let [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const login = useGoogleLogin({
+        scope: 'https://www.googleapis.com/auth/calendar.events',
         onSuccess: async (tokenResponse) => {
             const url =
                 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json';
@@ -19,10 +20,11 @@ const ConnectSocials = () => {
                     Authorization: `Bearer ${tokenResponse.access_token}`,
                 },
             });
+
             if (res) {
+                localStorage.setItem('googleAuth', tokenResponse.access_token);
                 toast.dismiss();
                 toast.success('Google connected successfully', toastStyles);
-                setActiveStep(1);
             }
         },
     });
