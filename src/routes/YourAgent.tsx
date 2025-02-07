@@ -64,7 +64,6 @@ const YourAgent = () => {
                     type: 'assistant',
                 },
             ]);
-            console.log(data);
         } catch (err) {
             toast.error('Something went wrong', toastStyles);
         }
