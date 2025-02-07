@@ -3,7 +3,7 @@ import { type VariantProps, cva } from 'class-variance-authority';
 import { SparklesIcon, UserIcon } from 'lucide-react';
 import React, { type ReactNode } from 'react';
 
-const chatMessageVariants = cva('flex gap-4 w-full', {
+const chatMessageVariants = cva('flex gap-4 w-full mt-5', {
     variants: {
         variant: {
             default: '',

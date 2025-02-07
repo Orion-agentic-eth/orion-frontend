@@ -1,8 +1,8 @@
 import OrionImage from '../../assets/orion-logo.png';
 
-export default function Navbar() {
+export default function Navbar({ title }: { title?: string }) {
     return (
-        <nav className="z-10 relative container mx-auto w-full">
+        <nav className="z-10 relative container mx-auto">
             <div className="w-full rounded-lg border border-[#79DFED] my-8 bg-[#1B1E29] backdrop-blur-xl">
                 <div className="flex h-16 items-center justify-between px-4">
                     <div className="flex items-center space-x-2">
@@ -29,7 +29,7 @@ export default function Navbar() {
 
                     {/* CTA Button */}
                     <button className="border border-[#FF5800] text-sm font-medium text-white rounded-lg py-2 px-4">
-                        Get Started
+                        {title ? title : 'Get Started'}
                     </button>
                 </div>
             </div>
