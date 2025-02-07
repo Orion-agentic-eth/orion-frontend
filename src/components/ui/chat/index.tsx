@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { SparklesIcon, UserIcon } from 'lucide-react';
 import React, { type ReactNode } from 'react';
+import { TextAnimate } from '../textAnimate';
 
 const chatMessageVariants = cva('flex gap-4 w-full', {
     variants: {
@@ -170,12 +171,13 @@ const chatMessageContentVariants = cva('flex flex-col gap-2', {
 interface ChatMessageContentProps extends React.HTMLAttributes<HTMLDivElement> {
     id?: string;
     content: any;
+    length: number;
 }
 
 const ChatMessageContent = React.forwardRef<
     HTMLDivElement,
     ChatMessageContentProps
->(({ className, content, id: idProp, children, ...props }, ref) => {
+>(({ className, content, length, id: idProp, children, ...props }, ref) => {
     const context = useChatMessage();
 
     const variant = context?.variant ?? 'default';
@@ -188,7 +190,13 @@ const ChatMessageContent = React.forwardRef<
             )}
             {...props}
         >
-            {content}
+            {length === 1 ? (
+                <TextAnimate animation="blurInUp" by="character">
+                    {content}
+                </TextAnimate>
+            ) : (
+                content
+            )}
         </div>
     );
 });

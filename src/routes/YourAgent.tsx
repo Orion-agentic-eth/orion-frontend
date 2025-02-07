@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import Navbar from '../components/navbar';
 import {
     ChatMessage,
@@ -10,65 +11,24 @@ import {
     ChatInputSubmit,
     ChatInputTextArea,
 } from '../components/ui/chat/input';
-import { scheduleEvent } from '../lib/helper';
-
+import { toastStyles } from '../config';
+interface Message {
+    id: string;
+    content: string;
+    type: 'user' | 'assistant';
+}
 const YourAgent = () => {
     const [value, setValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [messages, setMessages] = useState([
+
+    const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
-            content: 'Hey how are you?',
-            type: 'user',
-        },
-        {
-            id: '2',
-            content: "I'm fine, thanks for asking!",
+            content: 'What can I help with?',
             type: 'assistant',
-        },
-        {
-            id: '3',
-            content: 'Great!',
-            type: 'user',
-        },
-        {
-            id: '4',
-            content: 'Do you want to schedule it on calendar',
-            type: 'assistant',
-        },
-        {
-            id: '5',
-            content: (
-                <div>
-                    <button
-                        onClick={async () => {
-                            const res = await scheduleEvent();
-                            setMessages((prev) => [
-                                ...prev,
-                                {
-                                    id: String(prev.length + 1),
-                                    content: res,
-                                    type: 'assistant',
-                                },
-                            ]);
-                        }}
-                        className="px-4 py-1 bg-[#79DFED] text-black cursor-pointer rounded m-2"
-                    >
-                        Yes
-                    </button>
-                    <button
-                        onClick={() => console.log('No clicked')}
-                        className="px-4 py-1 bg-[#FF5800] text-white rounded m-2 cursor-pointer"
-                    >
-                        No
-                    </button>
-                </div>
-            ),
-            type: 'user',
         },
     ]);
-    const handleSubmit = () => {
-        setIsLoading(true);
+    const handleSubmit = async () => {
         setMessages((prev) => [
             ...prev,
             {
@@ -77,8 +37,38 @@ const YourAgent = () => {
                 type: 'user',
             },
         ]);
+        setIsLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('text', value);
+            formData.append('user', 'user');
+            setValue('');
+            const res = await fetch(
+                'https://8c17-2405-201-4024-580a-c16c-b6b1-e4e9-136d.ngrok-free.app/b84927f4-7146-00be-8812-593f1edca51c/message',
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+
+            if (!res.ok) {
+                throw new Error('Failed to fetch chat data');
+            }
+
+            const data = await res.json();
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: String(prev.length + 1),
+                    content: data[0].text,
+                    type: 'assistant',
+                },
+            ]);
+            console.log(data);
+        } catch (err) {
+            toast.error('Something went wrong', toastStyles);
+        }
         setIsLoading(false);
-        setValue('');
     };
     return (
         <div className="space-y-4 container mx-auto">
@@ -90,7 +80,10 @@ const YourAgent = () => {
                     type={message.type === 'user' ? 'outgoing' : 'incoming'}
                 >
                     {message.type === 'assistant' && <ChatMessageAvatar />}
-                    <ChatMessageContent content={message.content} />
+                    <ChatMessageContent
+                        content={message.content}
+                        length={messages.length}
+                    />
                     {message.type === 'user' && <ChatMessageAvatar />}
                 </ChatMessage>
             ))}
