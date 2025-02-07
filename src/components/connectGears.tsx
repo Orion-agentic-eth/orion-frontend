@@ -1,8 +1,34 @@
-import { generateCodeChallenge, generateCodeVerifier } from '../lib/helper';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import Vr from '../assets/vr.png';
 import Watch from '../assets/watch.png';
+import { fetchUserData, useFitbitAuth } from '../hooks/useFitbitAuth';
+import { generateCodeChallenge, generateCodeVerifier } from '../lib/helper';
+import useGlobalStorage from '../store';
 
 const ConnectGears = () => {
+    useFitbitAuth();
+    const sessionCode = sessionStorage.getItem('fitbit_token');
+    const { userInfo, setUserInfo, setActiveStep } = useGlobalStorage();
+    const { data } = useQuery({
+        queryKey: ['user-data'],
+        queryFn: () => fetchUserData(sessionCode!),
+        enabled: !!sessionCode,
+    });
+    useEffect(() => {
+        if (data) {
+            setUserInfo({
+                ...userInfo,
+                twitterUsername: localStorage.getItem('twitter_username'),
+                name: data.fullName,
+                age: data.age,
+                weight: data.weight,
+                height: data.height,
+                gender: data.gender,
+            });
+            setActiveStep(2);
+        }
+    }, [data]);
     const handleGetFitRedirection = async () => {
         const verifier = generateCodeVerifier();
         const challenge = await generateCodeChallenge(verifier);

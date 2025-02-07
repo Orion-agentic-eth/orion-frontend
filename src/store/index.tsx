@@ -3,17 +3,48 @@ import { create } from 'zustand';
 type Store = {
     activeStep: number;
     setActiveStep: (activeStep: number) => void;
+    userInfo: {
+        twitterUsername: string;
+        name: string;
+        age: string;
+        weight: string;
+        height: string;
+        gender: string;
+        location: string;
+        health: {
+            currentFitnessLevel: string;
+            goals: string[];
+            currentRoutine: string;
+        };
+        interests: string[];
+    };
+    setUserInfo: (userInfo: any) => void;
 };
 
-type InitialState = Pick<Store, 'activeStep'>;
-
-const initialState: InitialState = {
+const initialState = {
     activeStep: 0,
+    userInfo: {
+        name: '',
+        twitterUsername: '',
+        age: '',
+        weight: '',
+        height: '',
+        gender: '',
+        location: 'Delhi India',
+        health: {
+            currentFitnessLevel: 'Intermediate',
+            goals: ['Increase endurance', 'Improve flexibility'],
+            currentRoutine: 'Daily yoga and bi-weekly strength training',
+        },
+        interests: ['Blockchain', 'DeFi', 'Yoga', 'Running'],
+    },
 };
 
 const useGlobalStorage = create<Store>((set) => ({
     activeStep: initialState.activeStep,
     setActiveStep: (activeStep: number) => set({ activeStep }),
+    userInfo: initialState.userInfo,
+    setUserInfo: (userInfo: any) => set({ userInfo }),
 }));
 
 export default useGlobalStorage;

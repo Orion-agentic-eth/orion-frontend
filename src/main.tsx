@@ -5,10 +5,16 @@ import App from './routes/App.tsx';
 import Provider from './Provider.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import YourAgent from './routes/YourAgent.tsx';
+import LaunchAgent from './routes/LaunchAgent.tsx';
+
 const router = createBrowserRouter([
     {
         path: '/',
         element: <App />,
+    },
+    {
+        path: '/launch-your-agent',
+        element: <LaunchAgent />,
     },
     {
         path: '/your-agent',
