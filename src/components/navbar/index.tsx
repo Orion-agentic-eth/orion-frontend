@@ -64,7 +64,18 @@ export default function Navbar() {
 
                     {/* CTA Button */}
                     <div className="flex items-center gap-x-4">
-                        <button className="border border-[#FF5800] text-sm font-medium text-white rounded-lg py-2 px-4">
+                        <button
+                            className="cursor-pointer border border-[#FF5800] text-sm font-medium text-white rounded-lg py-2 px-4"
+                            onClick={() => {
+                                if (address) {
+                                    navigator.clipboard.writeText(address);
+                                    toast.success(
+                                        'Address copied',
+                                        toastStyles
+                                    );
+                                }
+                            }}
+                        >
                             {address
                                 ? address.slice(0, 12) +
                                   '...' +
