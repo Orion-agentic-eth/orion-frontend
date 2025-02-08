@@ -155,3 +155,23 @@ export const trxCaller = async (
     const data = await res.json();
     return { data: data.data.hash };
 };
+export const googleContacts = async () => {
+    const token = localStorage.getItem('googleAuth');
+    try {
+        const response = await fetch(
+            'https://people.googleapis.com/v1/people/me/connections?personFields=emailAddresses',
+            {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        toast.error('Error scheduling event:', toastStyles);
+    }
+};

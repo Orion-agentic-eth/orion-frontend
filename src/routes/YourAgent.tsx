@@ -10,7 +10,12 @@ import {
     ChatInputSubmit,
     ChatInputTextArea,
 } from '../components/ui/chat/input';
-import { extractEventDetails, scheduleEvent, trxCaller } from '../lib/helper';
+import {
+    extractEventDetails,
+    googleContacts,
+    scheduleEvent,
+    trxCaller,
+} from '../lib/helper';
 import PulsatingDots from '../components/ui/loaders';
 import useGlobalStorage from '../store';
 interface Message {
@@ -339,6 +344,7 @@ const YourAgent = () => {
                         <ChatInputSubmit />
                     </ChatInput>
                 </div>
+                <div onClick={googleContacts}>Contacts</div>
             </div>
         </div>
     );
