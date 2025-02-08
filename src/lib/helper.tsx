@@ -138,7 +138,7 @@ export const trxCaller = async (
     id: string[]
 ) => {
     const res = await fetch(
-        'https://54d3-49-36-139-19.ngrok-free.app/api/send-transaction',
+        'https://orion-server-wallet-production.up.railway.app/api/send-transaction',
         {
             method: 'POST',
             headers: {
