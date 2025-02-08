@@ -28,17 +28,23 @@ export const generateCodeChallenge = async (
     const hashedBuffer = await sha256(codeVerifier);
     return base64UrlEncode(hashedBuffer);
 };
-export const scheduleEvent = async () => {
+export const scheduleEvent = async ({
+    eventDetails,
+}: {
+    eventDetails: any;
+}) => {
     const token = localStorage.getItem('googleAuth');
 
     const event = {
-        summary: 'Scheduled Call',
+        summary: eventDetails.summary,
         start: {
-            dateTime: new Date().toISOString(),
+            dateTime: new Date(eventDetails.startDateTime).toISOString(),
             timeZone: 'Asia/Kolkata',
         },
         end: {
-            dateTime: new Date(new Date().getTime() + 30 * 60000).toISOString(),
+            dateTime: new Date(
+                new Date(eventDetails.startDateTime).getTime() + 30 * 60000
+            ).toISOString(),
             timeZone: 'Asia/Kolkata',
         },
     };
@@ -70,4 +76,58 @@ export const scheduleEvent = async () => {
     } catch (error) {
         toast.error('Error scheduling event:', toastStyles);
     }
+};
+export const extractEventDetails = (userInput: string) => {
+    // Default values
+    let summary = 'Scheduled Event';
+    let dateTime = new Date();
+    let duration = 30; // Default duration in minutes
+
+    // Extract title (any text before "on" or "at")
+    const titleMatch = userInput.match(
+        /(schedule|book|set up)\s+(.+?)(\s+on|\s+at|$)/i
+    );
+    if (titleMatch) {
+        summary = titleMatch[2].trim();
+    }
+
+    // Extract date and time
+    const dateMatch = userInput.match(
+        /\b(tomorrow|today|next\s+\w+|(?:\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2}))\b/i
+    );
+    const timeMatch = userInput.match(/(\d{1,2}(:\d{2})?\s?(AM|PM)?)/i);
+
+    if (dateMatch) {
+        const extractedDate = dateMatch[0].toLowerCase();
+        if (extractedDate === 'tomorrow') {
+            dateTime.setDate(dateTime.getDate() + 1);
+        } else if (extractedDate === 'today') {
+            // No change needed, date is already today
+        } else {
+            dateTime = new Date(extractedDate);
+        }
+    }
+
+    if (timeMatch) {
+        let timeString = timeMatch[1];
+        const isPM = timeString.includes('PM');
+        let [hours, minutes] = timeString
+            .replace(/(AM|PM)/i, '')
+            .split(':')
+            .map(Number);
+        if (isPM && hours < 12) hours += 12;
+        if (!minutes) minutes = 0;
+
+        dateTime.setHours(hours, minutes, 0);
+    }
+
+    // Extract duration (e.g., "for 30 minutes", "for 1 hour")
+    const durationMatch = userInput.match(/for\s+(\d+)\s*(minutes?|hours?)/i);
+    if (durationMatch) {
+        duration =
+            parseInt(durationMatch[1]) *
+            (durationMatch[2].includes('hour') ? 60 : 1);
+    }
+
+    return { summary, startDateTime: dateTime.toISOString(), duration };
 };

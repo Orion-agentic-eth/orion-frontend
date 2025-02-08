@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import Navbar from '../components/navbar';
 import {
     ChatMessage,
@@ -11,7 +10,7 @@ import {
     ChatInputSubmit,
     ChatInputTextArea,
 } from '../components/ui/chat/input';
-import { toastStyles } from '../config';
+import { extractEventDetails, scheduleEvent } from '../lib/helper';
 interface Message {
     id: string;
     content: string;
@@ -43,29 +42,44 @@ const YourAgent = () => {
             formData.append('text', value);
             formData.append('user', 'user');
             setValue('');
-            const res = await fetch(
-                'https://8c17-2405-201-4024-580a-c16c-b6b1-e4e9-136d.ngrok-free.app/b84927f4-7146-00be-8812-593f1edca51c/message',
-                {
-                    method: 'POST',
-                    body: formData,
+            const isScheduleRequest =
+                /schedule|book.*call|meeting|appointment/i.test(value);
+            if (isScheduleRequest) {
+                const eventDetails = extractEventDetails(value);
+                const res = await scheduleEvent({ eventDetails });
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: String(prev.length + 1),
+                        content: `Here is your calendar link ${res}`,
+                        type: 'assistant',
+                    },
+                ]);
+            } else {
+                const res = await fetch(
+                    'https://8c17-2405-201-4024-580a-c16c-b6b1-e4e9-136d.ngrok-free.app/b84927f4-7146-00be-8812-593f1edca51c/message',
+                    {
+                        method: 'POST',
+                        body: formData,
+                    }
+                );
+
+                if (!res.ok) {
+                    throw new Error('Failed to fetch chat data');
                 }
-            );
 
-            if (!res.ok) {
-                throw new Error('Failed to fetch chat data');
+                const data = await res.json();
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: String(prev.length + 1),
+                        content: data[0].text,
+                        type: 'assistant',
+                    },
+                ]);
             }
-
-            const data = await res.json();
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: String(prev.length + 1),
-                    content: data[0].text,
-                    type: 'assistant',
-                },
-            ]);
         } catch (err) {
-            toast.error('Something went wrong', toastStyles);
+            console.log(err);
         }
         setIsLoading(false);
     };
