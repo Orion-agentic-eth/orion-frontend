@@ -39,13 +39,13 @@ export const scheduleEvent = async ({
         summary: eventDetails.summary,
         start: {
             dateTime: new Date(eventDetails.startDateTime).toISOString(),
-            timeZone: 'Asia/Kolkata',
+            timeZone: 'UTC',
         },
         end: {
             dateTime: new Date(
                 new Date(eventDetails.startDateTime).getTime() + 30 * 60000
             ).toISOString(),
-            timeZone: 'Asia/Kolkata',
+            timeZone: 'UTC',
         },
     };
 
