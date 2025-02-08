@@ -34,7 +34,7 @@ export const scheduleEvent = async ({
     eventDetails: any;
 }) => {
     const token = localStorage.getItem('googleAuth');
-
+    const duration = eventDetails.duration || 30;
     const event = {
         summary: eventDetails.summary,
         start: {
@@ -43,7 +43,8 @@ export const scheduleEvent = async ({
         },
         end: {
             dateTime: new Date(
-                new Date(eventDetails.startDateTime).getTime() + 30 * 60000
+                new Date(eventDetails.startDateTime).getTime() +
+                    duration * 60000
             ).toISOString(),
             timeZone: 'UTC',
         },
@@ -65,7 +66,7 @@ export const scheduleEvent = async ({
         const data = await response.json();
 
         if (response.ok && data.htmlLink) {
-            toast.success(`Event Scheduled successfully`, toastStyles);
+            // toast.success(`Event Scheduled successfully`, toastStyles);
             return data.htmlLink;
         } else {
             return toast.error(

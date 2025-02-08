@@ -1,5 +1,5 @@
-import clsx from 'clsx';
 import { type VariantProps, cva } from 'class-variance-authority';
+import clsx from 'clsx';
 import { SparklesIcon, UserIcon } from 'lucide-react';
 import React, { type ReactNode } from 'react';
 import { TextAnimate } from '../textAnimate';
@@ -179,7 +179,6 @@ const ChatMessageContent = React.forwardRef<
     ChatMessageContentProps
 >(({ className, content, length, id: idProp, children, ...props }, ref) => {
     const context = useChatMessage();
-
     const variant = context?.variant ?? 'default';
     const type = context?.type ?? 'incoming';
     return (

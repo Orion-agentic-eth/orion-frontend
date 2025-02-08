@@ -3,11 +3,11 @@ import GoogleIcon from '../assets/google.png';
 import Xicon from '../assets/x.png';
 import useGlobalStorage from '../store';
 import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import toast from 'react-hot-toast';
 import { toastStyles } from '../config';
 const ConnectSocials = () => {
-    const { setActiveStep } = useGlobalStorage();
+    const { setActiveStep, userInfo, setUserInfo } = useGlobalStorage();
     let [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const login = useGoogleLogin({
@@ -20,9 +20,14 @@ const ConnectSocials = () => {
                     Authorization: `Bearer ${tokenResponse.access_token}`,
                 },
             });
+            const data = await res.json();
 
-            if (res) {
+            if (data) {
                 localStorage.setItem('googleAuth', tokenResponse.access_token);
+                setUserInfo({
+                    ...userInfo,
+                    picture: data.picture,
+                });
                 toast.dismiss();
                 toast.success('Google connected successfully', toastStyles);
             }
@@ -94,6 +99,7 @@ const ConnectSocials = () => {
                     </a>
                 </div>
             </div>
+            <Link to={'/your-agent'}>asdf</Link>
         </>
     );
 };

@@ -7,6 +7,7 @@ type Store = {
         twitterUsername: string;
         name: string;
         age: string;
+        picture: string;
         weight: string;
         height: string;
         gender: string;
@@ -27,6 +28,7 @@ const initialState = {
         name: '',
         twitterUsername: '',
         age: '',
+        picture: '',
         weight: '',
         height: '',
         gender: '',
