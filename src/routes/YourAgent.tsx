@@ -22,7 +22,6 @@ const YourAgent = () => {
     const [value, setValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { userInfo } = useGlobalStorage();
-    console.log(userInfo);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -53,13 +52,30 @@ const YourAgent = () => {
                     ...prev,
                     {
                         id: String(prev.length + 1),
-                        content: `Here is your calendar link ${res}`,
+                        content: (
+                            <>
+                                Here is your calendar{' '}
+                                <a
+                                    href={res}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="underline"
+                                >
+                                    link
+                                </a>
+                            </>
+                        ),
                         type: 'assistant',
                     },
                 ]);
                 setIsLoading(false);
             } else if ('Any upcoming ETH crypto events?' === value) {
                 setTimeout(() => {
+                    const messageContent = [
+                        'Here are some major ETH events coming up.',
+                        'Hong Kong Consensus 2025, February 18th to 20th.',
+                        'Pragma ETH Denver, February 25th, the largest ETH gathering of the month!',
+                    ];
                     setMessages((prev) => [
                         ...prev,
                         {
@@ -83,6 +99,12 @@ const YourAgent = () => {
                             type: 'assistant',
                         },
                     ]);
+                    const utterance = new SpeechSynthesisUtterance(
+                        messageContent.join(' ')
+                    );
+                    utterance.lang = 'en-US';
+                    utterance.rate = 1;
+                    speechSynthesis.speak(utterance);
                     setIsLoading(false);
                 }, 5000);
             } else if (
@@ -147,6 +169,11 @@ const YourAgent = () => {
                     console.log(data);
                 }, 0);
                 setTimeout(() => {
+                    const messageContent = [
+                        'Your booking is confirmed for Pragma ETH Denver!',
+                        'At The Ritz-Carlton on February 23rd - 25th.',
+                        'Youre all set See you there!',
+                    ];
                     setMessages((prev) => [
                         ...prev,
                         {
@@ -154,14 +181,31 @@ const YourAgent = () => {
                             content: (
                                 <>
                                     <div>💳 Processing payment...</div>
-                                    <div>✅ Booking confirmed!</div>
+                                    <div>
+                                        ✅ Booking confirmed!{' '}
+                                        <a
+                                            href="https://www.travala.com/booking?check_in=2025-02-23&check_out=2025-02-25&hotel_id=17198&location=5129540&package_id=391417031&place_types=AIRPORT&popular=FB&r1=1&roomBoards=BB&search_code=VZykGtWvlIjVr3en&step=payments"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="underline"
+                                        >
+                                            View Booking
+                                        </a>
+                                    </div>
                                     <div>
                                         📅 Schedule updated in your calendar. (
                                         {res})
                                     </div>
                                     <div>
-                                        📜 Booking Details:
-                                        (https://testnet.flowscan.io/account/bf7fff8568b04f9e)
+                                        📜 Booking Details:{' '}
+                                        <a
+                                            href="https://testnet.flowscan.io/account/bf7fff8568b04f9e"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="underline"
+                                        >
+                                            Link
+                                        </a>
                                     </div>
                                     <div>Event: Pragma ETH Denver</div>
                                     <div>Hotel: The Ritz-Carlton, Denver</div>
@@ -177,6 +221,12 @@ const YourAgent = () => {
                             type: 'assistant',
                         },
                     ]);
+                    const utterance = new SpeechSynthesisUtterance(
+                        messageContent.join(' ')
+                    );
+                    utterance.lang = 'en-US';
+                    utterance.rate = 1;
+                    speechSynthesis.speak(utterance);
                     setIsLoading(false);
                 }, 5000);
             } else {
