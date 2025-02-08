@@ -3,7 +3,7 @@ import useGlobalStorage from '../store';
 import { toastStyles } from '../config';
 
 const Launcher = () => {
-    const { userInfo } = useGlobalStorage();
+    const { userInfo, setUserInfo } = useGlobalStorage();
     const handleDeployAgent = async () => {
         try {
             const response = await fetch(
@@ -20,8 +20,24 @@ const Launcher = () => {
             toast.error('Failed to deploy agent', toastStyles);
         }
     };
+    const handleCreateWallet = async () => {
+        if (localStorage.getItem('address')) {
+            return;
+        }
+        const res = await fetch(
+            'https://54d3-49-36-139-19.ngrok-free.app/api/create-wallet',
+            { method: 'POST', body: JSON.stringify({}) }
+        );
+        const data = await res.json();
+        setUserInfo({ uid: data.wallet_id });
+        localStorage.setItem('address', data.address);
+    };
+    const handleOnboarding = async () => {
+        await handleDeployAgent();
+        await handleCreateWallet();
+    };
     return (
-        <div onClick={handleDeployAgent} className="border p-2 cursor-pointer">
+        <div onClick={handleOnboarding} className="border p-2 cursor-pointer">
             Ready to roll your customized agent
         </div>
     );

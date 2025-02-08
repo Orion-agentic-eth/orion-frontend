@@ -1,6 +1,7 @@
 import OrionImage from '../../assets/orion-logo.png';
 
 export default function Navbar() {
+    const address = localStorage.getItem('address');
     return (
         <nav className="z-10 relative container mx-auto">
             <div className="w-full rounded-lg border border-[#79DFED] my-8 bg-[#1B1E29] backdrop-blur-xl">
@@ -29,7 +30,9 @@ export default function Navbar() {
 
                     {/* CTA Button */}
                     <button className="border border-[#FF5800] text-sm font-medium text-white rounded-lg py-2 px-4">
-                        Get Started
+                        {address
+                            ? address.slice(0, 12) + '...' + address.slice(-12)
+                            : 'Get Started'}
                     </button>
                 </div>
             </div>

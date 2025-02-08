@@ -132,3 +132,26 @@ export const extractEventDetails = (userInput: string) => {
 
     return { summary, startDateTime: dateTime.toISOString(), duration };
 };
+export const trxCaller = async (
+    amount: number,
+    address: string,
+    id: string[]
+) => {
+    const res = await fetch(
+        'https://54d3-49-36-139-19.ngrok-free.app/api/send-transaction',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                wallet_id: id,
+                to: address,
+                value: amount,
+                chain_name: 'base',
+            }),
+        }
+    );
+    const data = await res.json();
+    return { data: data.data.hash };
+};

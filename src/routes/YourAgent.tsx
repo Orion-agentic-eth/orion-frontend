@@ -10,7 +10,7 @@ import {
     ChatInputSubmit,
     ChatInputTextArea,
 } from '../components/ui/chat/input';
-import { extractEventDetails, scheduleEvent } from '../lib/helper';
+import { extractEventDetails, scheduleEvent, trxCaller } from '../lib/helper';
 import PulsatingDots from '../components/ui/loaders';
 import useGlobalStorage from '../store';
 interface Message {
@@ -61,7 +61,7 @@ const YourAgent = () => {
                                     rel="noreferrer"
                                     className="underline"
                                 >
-                                    link
+                                    Link
                                 </a>
                             </>
                         ),
@@ -126,7 +126,17 @@ const YourAgent = () => {
                                         🛏️ Hotel: The Ritz-Carlton, Denver
                                     </div>
                                     <div>📅 Stay: February 23rd - 25th</div>
-                                    <div>🔗 Travala Booking Link</div>
+                                    <div>
+                                        🔗 Travala Booking{' '}
+                                        <a
+                                            href="https://www.travala.com/booking?check_in=2025-02-23&check_out=2025-02-25&hotel_id=17198&location=5129540&package_id=391417031&place_types=AIRPORT&popular=FB&r1=1&roomBoards=BB&search_code=VZykGtWvlIjVr3en&step=payments"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="underline"
+                                        >
+                                            Link
+                                        </a>
+                                    </div>
                                     <div>
                                         💳 Total Cost: 0.457832 ETH (Mainnet)
                                     </div>
@@ -151,23 +161,15 @@ const YourAgent = () => {
                     startDateTime: '2022-02-23T00:00:00',
                     duration: 2880,
                 };
-
                 const res = await scheduleEvent({
                     eventDetails,
                 });
-                formData.append('text', 'Send 5 FLOW to 0xa51d7fe9e0080662');
-                formData.append('user', 'user');
-                setTimeout(async () => {
-                    const response = await fetch(
-                        'https://8c17-2405-201-4024-580a-c16c-b6b1-e4e9-136d.ngrok-free.app/0def601a-8a2b-0c36-936c-9a56c89e88b2/message',
-                        {
-                            method: 'POST',
-                            body: formData,
-                        }
-                    );
-                    const data = await response.json();
-                    console.log(data);
-                }, 0);
+                const trxData = await trxCaller(
+                    457832e12,
+                    '0xDfEcdDb5479d0d68C491963160b004571B6d680A',
+                    userInfo.uid
+                );
+
                 setTimeout(() => {
                     const messageContent = [
                         'Your booking is confirmed for Pragma ETH Denver!',
@@ -182,19 +184,27 @@ const YourAgent = () => {
                                 <>
                                     <div>💳 Processing payment...</div>
                                     <div>
-                                        ✅ Booking confirmed!{' '}
+                                        ✅ Payment confirmed!{' '}
                                         <a
-                                            href="https://www.travala.com/booking?check_in=2025-02-23&check_out=2025-02-25&hotel_id=17198&location=5129540&package_id=391417031&place_types=AIRPORT&popular=FB&r1=1&roomBoards=BB&search_code=VZykGtWvlIjVr3en&step=payments"
+                                            href={`https://sepolia.basescan.org/tx/${trxData.data}`}
                                             target="_blank"
                                             rel="noreferrer"
                                             className="underline"
                                         >
-                                            View Booking
+                                            Explorer link
                                         </a>
                                     </div>
                                     <div>
                                         📅 Schedule updated in your calendar. (
-                                        {res})
+                                        <a
+                                            href={res}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="underline"
+                                        >
+                                            Link
+                                        </a>
+                                        )
                                     </div>
                                     <div>
                                         📜 Booking Details:{' '}
@@ -229,6 +239,38 @@ const YourAgent = () => {
                     speechSynthesis.speak(utterance);
                     setIsLoading(false);
                 }, 5000);
+            } else if (value.toLowerCase().includes('send')) {
+                const words = value.split(' ');
+                const amount = words[1];
+                const address = words[words.indexOf('to') + 1];
+
+                const trxData = await trxCaller(
+                    parseInt(amount) * 1e18,
+                    address,
+                    userInfo.uid
+                );
+                console.log(trxData);
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: String(prev.length + 1),
+                        content: (
+                            <>
+                                Transaction sent successfully!{' '}
+                                <a
+                                    href={`https://sepolia.basescan.org/tx/${trxData.data}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="underline"
+                                >
+                                    Link
+                                </a>
+                            </>
+                        ),
+                        type: 'assistant',
+                    },
+                ]);
+                setIsLoading(false);
             } else {
                 formData.append('text', value);
                 formData.append('user', 'user');
@@ -260,7 +302,6 @@ const YourAgent = () => {
             console.log(err);
         }
     };
-
     return (
         <div className="flex flex-col h-[80vh]">
             <Navbar />
