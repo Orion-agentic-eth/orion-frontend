@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/navbar';
 import {
     ChatMessage,
@@ -10,19 +10,27 @@ import {
     ChatInputSubmit,
     ChatInputTextArea,
 } from '../components/ui/chat/input';
+import PulsatingDots from '../components/ui/loaders';
 import {
     extractEventDetails,
     googleContacts,
     scheduleEvent,
     trxCaller,
+    voiceSupport,
 } from '../lib/helper';
-import PulsatingDots from '../components/ui/loaders';
 import useGlobalStorage from '../store';
 interface Message {
     id: string;
     content: string | JSX.Element;
     type: 'user' | 'assistant';
 }
+declare global {
+    interface Window {
+        SpeechRecognition: any;
+        webkitSpeechRecognition: any;
+    }
+}
+
 const YourAgent = () => {
     const [value, setValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +42,32 @@ const YourAgent = () => {
             type: 'assistant',
         },
     ]);
+    const startListening = () => {
+        const recognition = new (window.SpeechRecognition ||
+            window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US'; // Set language
+        recognition.interimResults = false; // Get only final result
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+            setIsLoading(true);
+        };
+
+        recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setValue(transcript);
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error('Speech recognition error:', event.error);
+        };
+
+        recognition.onend = () => {
+            setIsLoading(false);
+        };
+
+        recognition.start();
+    };
     const handleSubmit = async () => {
         setMessages((prev) => [
             ...prev,
@@ -50,9 +84,17 @@ const YourAgent = () => {
             setValue('');
             const isScheduleRequest =
                 /schedule|book.*call|meeting|appointment/i.test(value);
+            const doctorsAppointment = /add/i.test(value);
             if (isScheduleRequest) {
                 const eventDetails = extractEventDetails(value);
-                const res = await scheduleEvent({ eventDetails });
+                const res = await scheduleEvent({
+                    eventDetails,
+                    attendeesEmail: userInfo.email,
+                });
+                const messageContent =
+                    'Meeting scheduled successfully!, here is your calendar link';
+
+                voiceSupport(messageContent);
                 setMessages((prev) => [
                     ...prev,
                     {
@@ -104,12 +146,8 @@ const YourAgent = () => {
                             type: 'assistant',
                         },
                     ]);
-                    const utterance = new SpeechSynthesisUtterance(
-                        messageContent.join(' ')
-                    );
-                    utterance.lang = 'en-US';
-                    utterance.rate = 1;
-                    speechSynthesis.speak(utterance);
+
+                    voiceSupport(messageContent.join(' '));
                     setIsLoading(false);
                 }, 5000);
             } else if (
@@ -162,12 +200,13 @@ const YourAgent = () => {
                 }, 5000);
             } else if ('Yes, go ahead' === value) {
                 let eventDetails = {
-                    summary: 'Pragma ETH Denver',
+                    summary: 'Pragma ETH Denver, At The Ritz-Carlton',
                     startDateTime: '2022-02-23T00:00:00',
                     duration: 2880,
                 };
                 const res = await scheduleEvent({
                     eventDetails,
+                    attendeesEmail: userInfo.email,
                 });
                 const trxData = await trxCaller(
                     457832e12,
@@ -236,12 +275,8 @@ const YourAgent = () => {
                             type: 'assistant',
                         },
                     ]);
-                    const utterance = new SpeechSynthesisUtterance(
-                        messageContent.join(' ')
-                    );
-                    utterance.lang = 'en-US';
-                    utterance.rate = 1;
-                    speechSynthesis.speak(utterance);
+                    voiceSupport(messageContent.join(' '));
+
                     setIsLoading(false);
                 }, 5000);
             } else if (value.toLowerCase().includes('send')) {
@@ -253,7 +288,6 @@ const YourAgent = () => {
                     address,
                     userInfo.uid
                 );
-                console.log(trxData);
                 setMessages((prev) => [
                     ...prev,
                     {
@@ -275,6 +309,96 @@ const YourAgent = () => {
                     },
                 ]);
                 setIsLoading(false);
+            } else if (doctorsAppointment) {
+                const res = await googleContacts();
+                const filteredContacts = res.filter((contact: any) =>
+                    contact.names?.some((email: any) => {
+                        return value
+                            .toLowerCase()
+                            .includes(email.displayName.toLowerCase());
+                    })
+                );
+                if (
+                    filteredContacts.length > 0 &&
+                    filteredContacts[0]?.names?.length > 0
+                ) {
+                    const doc = filteredContacts[0].names[0].displayName;
+
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: String(prev.length + 1),
+                            content: `Scheduling a call with Dr. ${doc} for tomorrow, paying for the appointment.`,
+                            type: 'assistant',
+                        },
+                    ]);
+                    //TODO do tranasction
+                    // const trxData = await trxCaller(1e6, doc, userInfo.uid);
+                    // setMessages((prev) => [
+                    //     ...prev,
+                    //     {
+                    //         id: String(prev.length + 1),
+                    //         content: (
+                    //             <>
+                    //                 Payment successful!{' '}
+                    //                 <a
+                    //                     href={`https://sepolia.basescan.org/tx/${trxData.data}`}
+                    //                     target="_blank"
+                    //                     rel="noreferrer"
+                    //                     className="underline"
+                    //                 >
+                    //                     Link
+                    //                 </a>
+                    //             </>
+                    //         ),
+                    //         type: 'assistant',
+                    //     },
+                    // ]);
+                    const nextDay = new Date();
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    const formattedDate = nextDay.toISOString().split('T')[0];
+                    let eventDetails = {
+                        summary: `Appointment with Dr. ${doc}`,
+                        startDateTime: `${formattedDate}T00:00:00`,
+                        duration: 30,
+                    };
+                    const res = await scheduleEvent({
+                        eventDetails,
+                        attendeesEmail: userInfo.email,
+                    });
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: String(prev.length + 1),
+                            content: (
+                                <>
+                                    Here is your calendar{' '}
+                                    <a
+                                        href={res}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="underline"
+                                    >
+                                        link
+                                    </a>
+                                </>
+                            ),
+                            type: 'assistant',
+                        },
+                    ]);
+                    voiceSupport('Appointment scheduled successfully!');
+                    setIsLoading(false);
+                } else {
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: String(prev.length + 1),
+                            content: 'No matching email found.',
+                            type: 'assistant',
+                        },
+                    ]);
+                    setIsLoading(false);
+                }
             } else {
                 formData.append('text', value);
                 formData.append('user', 'user');
@@ -306,6 +430,13 @@ const YourAgent = () => {
             console.log(err);
         }
     };
+    React.useEffect(() => {
+        const messageContent = [
+            'Welcome to Orion, your personal assistant.',
+            'What can I help with?',
+        ];
+        voiceSupport(messageContent.join(' '));
+    }, []);
     return (
         <div className="flex flex-col h-[80vh] font-orbitron">
             <Navbar />
@@ -341,10 +472,9 @@ const YourAgent = () => {
                         onStop={() => setIsLoading(false)}
                     >
                         <ChatInputTextArea placeholder="Type a message..." />
-                        <ChatInputSubmit />
+                        <ChatInputSubmit startListening={startListening} />{' '}
                     </ChatInput>
                 </div>
-                <div onClick={googleContacts}>Contacts</div>
             </div>
         </div>
     );

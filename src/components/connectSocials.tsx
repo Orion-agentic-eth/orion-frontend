@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { toastStyles } from '../config';
 const ConnectSocials = () => {
     const { setActiveStep, userInfo, setUserInfo } = useGlobalStorage();
+    const [triggerEffect, setTriggerEffect] = React.useState(false);
     let [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const login = useGoogleLogin({
@@ -21,32 +22,38 @@ const ConnectSocials = () => {
                 },
             });
             const data = await res.json();
-
             if (data) {
                 localStorage.setItem('googleAuth', tokenResponse.access_token);
                 setUserInfo({
                     ...userInfo,
+                    email: data.email,
                     picture: data.picture,
                 });
                 toast.dismiss();
                 toast.success('Google connected successfully', toastStyles);
+                setTriggerEffect(true);
             }
         },
     });
     React.useEffect(() => {
         const queryCode = searchParams.get('twitter_username');
-        const code = searchParams.get('code');
         if (queryCode) {
             localStorage.setItem('twitter_username', queryCode);
             toast.dismiss();
             toast.success('Twitter connected successfully', toastStyles);
-            setActiveStep(1);
+            setTriggerEffect(true);
         }
-        if (code) {
-            setActiveStep(1);
-        }
+
         navigate(window.location.pathname, { replace: true });
     }, [searchParams]);
+    React.useEffect(() => {
+        if (
+            localStorage.getItem('googleAuth') &&
+            localStorage.getItem('twitter_username')
+        ) {
+            setActiveStep(2);
+        }
+    }, [triggerEffect]);
     return (
         <>
             <div className="border border-[#79DFED] rounded-xl h-full w-full md:size-[400px] mx-4 md:ml-20 text-center md:text-left">
@@ -66,10 +73,15 @@ const ConnectSocials = () => {
                         scheduling.
                     </p>
                     <button
+                        disabled={
+                            localStorage.getItem('googleAuth') ? true : false
+                        }
                         className="border border-[#FF5800] p-2 rounded-lg w-full md:w-auto cursor-pointer"
                         onClick={() => login()}
                     >
-                        Connect Now
+                        {localStorage.getItem('googleAuth')
+                            ? 'Connected'
+                            : 'Connect Now'}
                     </button>
                 </div>
             </div>
@@ -77,8 +89,8 @@ const ConnectSocials = () => {
                 <img
                     src={Xicon}
                     alt="twitter"
-                    height={190}
-                    width={190}
+                    height={170}
+                    width={170}
                     className="mx-auto py-5"
                 />
                 <div className="bg-[#1A1D25]  p-6 rounded-b-xl">
@@ -89,14 +101,20 @@ const ConnectSocials = () => {
                         Get AI-curated insights and stay updated with trending
                         topics.
                     </p>
-                    <a
-                        href={
-                            'https://x-auth-production.up.railway.app/auth/twitter'
-                        }
-                        className="border border-[#FF5800] p-2 rounded-lg w-full md:w-auto cursor-pointer"
-                    >
-                        Connect Now
-                    </a>
+                    {localStorage.getItem('twitter_username') ? (
+                        <div className="border  border-[#FF5800] p-2 rounded-lg w-fit  cursor-pointer">
+                            Connected
+                        </div>
+                    ) : (
+                        <a
+                            href={
+                                'https://x-auth-production.up.railway.app/auth/twitter'
+                            }
+                            className="border border-[#FF5800] p-2 rounded-lg w-full md:w-auto cursor-pointer"
+                        >
+                            Connect Now
+                        </a>
+                    )}
                 </div>
             </div>
             <Link to={'/your-agent'}>asdf</Link>

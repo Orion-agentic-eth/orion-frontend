@@ -126,6 +126,7 @@ interface ChatInputSubmitProps extends React.ComponentProps<any> {
     onSubmit?: () => void;
     loading?: boolean;
     onStop?: () => void;
+    startListening?: () => void;
 }
 
 function ChatInputSubmit({
@@ -133,6 +134,7 @@ function ChatInputSubmit({
     loading: loadingProp,
     onStop: onStopProp,
     className,
+    startListening,
     ...props
 }: ChatInputSubmitProps) {
     const context = useContext(ChatInputContext);
@@ -173,22 +175,31 @@ function ChatInputSubmit({
         typeof context.value !== 'string' || context.value.trim().length === 0;
 
     return (
-        <button
-            className={clsx(
-                'shrink-0 rounded-full p-1.5 h-fit border dark:border-zinc-600',
-                className
-            )}
-            disabled={isDisabled}
-            onClick={(event) => {
-                event.preventDefault();
-                if (!isDisabled) {
-                    onSubmit?.();
-                }
-            }}
-            {...props}
-        >
-            <ArrowUpIcon />
-        </button>
+        <div className="flex items-center gap-x-6">
+            <button
+                onClick={startListening}
+                className="text-white cursor-pointer"
+                aria-label="Read message"
+            >
+                🔊
+            </button>
+            <button
+                className={clsx(
+                    'shrink-0 cursor-pointer rounded-full p-1.5 h-fit border dark:border-zinc-600',
+                    className
+                )}
+                disabled={isDisabled}
+                onClick={(event) => {
+                    event.preventDefault();
+                    if (!isDisabled) {
+                        onSubmit?.();
+                    }
+                }}
+                {...props}
+            >
+                <ArrowUpIcon />
+            </button>
+        </div>
     );
 }
 

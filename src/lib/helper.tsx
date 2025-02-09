@@ -30,8 +30,10 @@ export const generateCodeChallenge = async (
 };
 export const scheduleEvent = async ({
     eventDetails,
+    attendeesEmail,
 }: {
     eventDetails: any;
+    attendeesEmail?: string;
 }) => {
     const token = localStorage.getItem('googleAuth');
     const duration = eventDetails.duration || 30;
@@ -48,6 +50,11 @@ export const scheduleEvent = async ({
             ).toISOString(),
             timeZone: 'UTC',
         },
+        attendees: [
+            {
+                email: attendeesEmail,
+            },
+        ],
     };
 
     try {
@@ -159,7 +166,7 @@ export const googleContacts = async () => {
     const token = localStorage.getItem('googleAuth');
     try {
         const response = await fetch(
-            'https://people.googleapis.com/v1/people/me/connections?personFields=emailAddresses',
+            'https://people.googleapis.com/v1/people/me/connections?personFields=emailAddresses,names',
             {
                 method: 'GET',
                 headers: {
@@ -168,10 +175,44 @@ export const googleContacts = async () => {
                 },
             }
         );
-
         const data = await response.json();
-        console.log(data);
+        return data.connections;
     } catch (error) {
         toast.error('Error scheduling event:', toastStyles);
+    }
+};
+export const voiceSupport = (messageContent: string) => {
+    const speak = () => {
+        const utterance = new SpeechSynthesisUtterance(messageContent);
+        utterance.lang = 'en-US';
+        utterance.rate = 1;
+        utterance.pitch = 0.5; // Deep voice
+
+        const voices = speechSynthesis.getVoices();
+        if (voices.length === 0) {
+            console.warn('No voices available yet.');
+            return;
+        }
+
+        const maleVoice = voices.find(
+            (voice) =>
+                voice.name.includes('Male') ||
+                voice.name.includes('Deep') ||
+                voice.name.includes('Barry')
+        );
+
+        if (maleVoice) {
+            utterance.voice = maleVoice;
+        } else {
+            console.warn('No deep male voice found. Using default.');
+        }
+
+        speechSynthesis.speak(utterance);
+    };
+
+    if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.onvoiceschanged = speak; // Wait for voices to load
+    } else {
+        speak(); // If voices are already available, speak immediately
     }
 };

@@ -8,6 +8,7 @@ type Store = {
         name: string;
         uid: string[];
         age: string;
+        email: string;
         picture: string;
         weight: string;
         height: string;
@@ -30,6 +31,7 @@ const initialState = {
         twitterUsername: '',
         uid: [],
         age: '',
+        email: '',
         picture: '',
         weight: '',
         height: '',
