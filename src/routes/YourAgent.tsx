@@ -309,15 +309,12 @@ const YourAgent = () => {
             } else if (doctorsAppointment) {
                 const res = await googleContacts();
                 const filteredContacts = res.filter((contact: any) => {
-                    console.log(contact);
                     return contact.emailAddresses?.some((email: any) => {
-                        console.log(email);
-                        return value
+                        return email.value
                             .toLowerCase()
-                            .includes(email.value.toLowerCase());
+                            .includes(value.toLowerCase());
                     });
                 });
-                console.log(filteredContacts);
                 if (
                     filteredContacts.length > 0 &&
                     filteredContacts[0]?.emailAddresses?.length > 0
@@ -364,7 +361,7 @@ const YourAgent = () => {
                     };
                     const res = await scheduleEvent({
                         eventDetails,
-                        attendeesEmail: userInfo.email,
+                        attendeesEmail: doc,
                     });
                     setMessages((prev) => [
                         ...prev,
