@@ -87,7 +87,7 @@ const YourAgent = () => {
                 const eventDetails = extractEventDetails(value);
                 const res = await scheduleEvent({
                     eventDetails,
-                    attendeesEmail: userInfo.email,
+                    attendeesEmail: localStorage.getItem('mail') || '',
                 });
                 const messageContent =
                     'Meeting scheduled successfully!, here is your calendar link';
@@ -201,7 +201,7 @@ const YourAgent = () => {
                 };
                 const res = await scheduleEvent({
                     eventDetails,
-                    attendeesEmail: userInfo.email,
+                    attendeesEmail: localStorage.getItem('mail') || '',
                 });
                 const trxData = await trxCaller(
                     457832e12,

@@ -26,9 +26,9 @@ const ConnectSocials = () => {
                 localStorage.setItem('googleAuth', tokenResponse.access_token);
                 setUserInfo({
                     ...userInfo,
-                    email: data.email,
                     picture: data.picture,
                 });
+                localStorage.setItem('mail', data.email);
                 toast.dismiss();
                 toast.success('Google connected successfully', toastStyles);
                 setTriggerEffect(true);
