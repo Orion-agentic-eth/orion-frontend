@@ -204,7 +204,7 @@ const YourAgent = () => {
                     attendeesEmail: localStorage.getItem('mail') || '',
                 });
                 const trxData = await trxCaller(
-                    457832e12,
+                    4,
                     '0xDfEcdDb5479d0d68C491963160b004571B6d680A',
                     userInfo.uid
                 );
@@ -323,7 +323,7 @@ const YourAgent = () => {
                         ...prev,
                         {
                             id: String(prev.length + 1),
-                            content: `Scheduling a call with Dr. ${doc} for tomorrow, paying 0.004 ETH for the appointment.`,
+                            content: `Scheduling a call with ${doc} for tomorrow, paying 0.004 ETH for the appointment.`,
                             type: 'assistant',
                         },
                     ]);
