@@ -310,11 +310,13 @@ const YourAgent = () => {
                 const res = await googleContacts();
                 const filteredContacts = res.filter((contact: any) => {
                     return contact.emailAddresses?.some((email: any) => {
+                        console.log(email.value);
                         return email.value
                             .toLowerCase()
                             .includes(value.toLowerCase());
                     });
                 });
+                console.log(filteredContacts);
                 if (
                     filteredContacts.length > 0 &&
                     filteredContacts[0]?.emailAddresses?.length > 0
