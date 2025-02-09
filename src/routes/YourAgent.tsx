@@ -116,7 +116,7 @@ const YourAgent = () => {
                     },
                 ]);
                 setIsLoading(false);
-            } else if ('Any upcoming ETH crypto events?' === value) {
+            } else if (value.toLowerCase().includes('any upcoming crypto')) {
                 setTimeout(() => {
                     const messageContent = [
                         'Here are some major ETH events coming up.',
@@ -150,10 +150,7 @@ const YourAgent = () => {
                     voiceSupport(messageContent.join(' '));
                     setIsLoading(false);
                 }, 5000);
-            } else if (
-                "Let's register for Pragma ETH Denver and book tickets" ===
-                value
-            ) {
+            } else if (value.toLowerCase().includes('pragma')) {
                 setTimeout(() => {
                     setMessages((prev) => [
                         ...prev,
@@ -198,7 +195,7 @@ const YourAgent = () => {
                     ]);
                     setIsLoading(false);
                 }, 5000);
-            } else if ('Yes, go ahead' === value) {
+            } else if (value.toLowerCase().includes('yes go ahead')) {
                 let eventDetails = {
                     summary: 'Pragma ETH Denver, At The Ritz-Carlton',
                     startDateTime: '2022-02-23T00:00:00',
@@ -312,17 +309,17 @@ const YourAgent = () => {
             } else if (doctorsAppointment) {
                 const res = await googleContacts();
                 const filteredContacts = res.filter((contact: any) =>
-                    contact.names?.some((email: any) => {
+                    contact.emailAddresses?.some((email: any) => {
                         return value
                             .toLowerCase()
-                            .includes(email.displayName.toLowerCase());
+                            .includes(email.value.toLowerCase());
                     })
                 );
                 if (
                     filteredContacts.length > 0 &&
-                    filteredContacts[0]?.names?.length > 0
+                    filteredContacts[0]?.emailAddresses?.length > 0
                 ) {
-                    const doc = filteredContacts[0].names[0].displayName;
+                    const doc = filteredContacts[0].emailAddresses[0].value;
 
                     setMessages((prev) => [
                         ...prev,

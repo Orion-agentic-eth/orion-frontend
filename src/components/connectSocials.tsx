@@ -51,7 +51,7 @@ const ConnectSocials = () => {
             localStorage.getItem('googleAuth') &&
             localStorage.getItem('twitter_username')
         ) {
-            setActiveStep(2);
+            setActiveStep(1);
         }
     }, [triggerEffect]);
     return (

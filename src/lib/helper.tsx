@@ -166,7 +166,7 @@ export const googleContacts = async () => {
     const token = localStorage.getItem('googleAuth');
     try {
         const response = await fetch(
-            'https://people.googleapis.com/v1/people/me/connections?personFields=emailAddresses,names',
+            'https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses',
             {
                 method: 'GET',
                 headers: {
