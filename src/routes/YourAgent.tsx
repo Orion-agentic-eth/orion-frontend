@@ -406,7 +406,7 @@ const YourAgent = () => {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            name: userInfo.dynamicId,
+                            name: localStorage.getItem('dynamicId'),
                             question: value,
                         }),
                     }

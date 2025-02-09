@@ -2,11 +2,13 @@ import toast from 'react-hot-toast';
 import useGlobalStorage from '../store';
 import { toastStyles } from '../config';
 import { Confetti, ConfettiRef } from './ui/confeti';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import PulsatingDots from './ui/loaders';
 
 const Launcher = () => {
     const { userInfo, setUserInfo } = useGlobalStorage();
+    const [loader, setLoader] = useState(false);
     const navigate = useNavigate();
     const confettiRef = useRef<ConfettiRef>(null);
     const handleDeployAgent = async () => {
@@ -30,7 +32,7 @@ const Launcher = () => {
                     }
                 );
                 const resp = await res.json();
-                setUserInfo({ dynamicId: resp.name });
+                localStorage.setItem('dynamicId', resp.name);
             }
         } catch (err) {
             toast.error('Failed to deploy agent', toastStyles);
@@ -49,8 +51,10 @@ const Launcher = () => {
         localStorage.setItem('address', data.address);
     };
     const handleOnboarding = async () => {
+        setLoader(true);
         await handleDeployAgent();
         await handleCreateWallet();
+        setLoader(false);
         navigate('/your-agent');
     };
     return (
@@ -58,9 +62,12 @@ const Launcher = () => {
             onClick={handleOnboarding}
             className="relative px-20 flex h-[150px] ml-44 flex-col items-center justify-center overflow-hidden rounded-lg border "
         >
-            <span className="underline cursor-pointer text-center font-semibold leading-none">
-                Ready to roll your customized agent
-            </span>
+            <div className="flex items-center">
+                <span className="underline cursor-pointer text-center font-semibold leading-none">
+                    Ready to roll your customized agent
+                </span>
+                {loader && <PulsatingDots />}
+            </div>
 
             <Confetti
                 ref={confettiRef}
