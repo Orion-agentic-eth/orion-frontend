@@ -1,11 +1,11 @@
 import { useGoogleLogin } from '@react-oauth/google';
+import React from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate, useSearchParams } from 'react-router';
 import GoogleIcon from '../assets/google.png';
 import Xicon from '../assets/x.png';
-import useGlobalStorage from '../store';
-import React from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router';
-import toast from 'react-hot-toast';
 import { toastStyles } from '../config';
+import useGlobalStorage from '../store';
 const ConnectSocials = () => {
     const { setActiveStep, userInfo, setUserInfo } = useGlobalStorage();
     const [triggerEffect, setTriggerEffect] = React.useState(false);
@@ -117,7 +117,6 @@ const ConnectSocials = () => {
                     )}
                 </div>
             </div>
-            <Link to={'/your-agent'}>asdf</Link>
         </>
     );
 };

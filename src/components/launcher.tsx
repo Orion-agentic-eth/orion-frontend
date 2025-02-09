@@ -12,7 +12,7 @@ const Launcher = () => {
     const handleDeployAgent = async () => {
         try {
             const response = await fetch(
-                'https://7011-2405-201-4024-580a-c16c-b6b1-e4e9-136d.ngrok-free.app/create-character',
+                'https://0598-2405-201-4024-580a-531-12cf-5bcf-e757.ngrok-free.app/create-character',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -20,7 +20,18 @@ const Launcher = () => {
                 }
             );
             const data = await response.json();
-            console.log(data); //TODO do an api call
+            if (data) {
+                const res = await fetch(
+                    'https://orion-eliza-production.up.railway.app/api/knowledge-base/add',
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data.character),
+                    }
+                );
+                const resp = await res.json();
+                setUserInfo({ dynamicId: resp.name });
+            }
         } catch (err) {
             toast.error('Failed to deploy agent', toastStyles);
         }

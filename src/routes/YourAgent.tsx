@@ -79,8 +79,6 @@ const YourAgent = () => {
         ]);
         setIsLoading(true);
         try {
-            const formData = new FormData();
-
             setValue('');
             const isScheduleRequest =
                 /schedule|book.*call|meeting|appointment/i.test(value);
@@ -325,32 +323,35 @@ const YourAgent = () => {
                         ...prev,
                         {
                             id: String(prev.length + 1),
-                            content: `Scheduling a call with Dr. ${doc} for tomorrow, paying for the appointment.`,
+                            content: `Scheduling a call with Dr. ${doc} for tomorrow, paying 0.004 ETH for the appointment.`,
                             type: 'assistant',
                         },
                     ]);
-                    //TODO do tranasction
-                    // const trxData = await trxCaller(1e6, doc, userInfo.uid);
-                    // setMessages((prev) => [
-                    //     ...prev,
-                    //     {
-                    //         id: String(prev.length + 1),
-                    //         content: (
-                    //             <>
-                    //                 Payment successful!{' '}
-                    //                 <a
-                    //                     href={`https://sepolia.basescan.org/tx/${trxData.data}`}
-                    //                     target="_blank"
-                    //                     rel="noreferrer"
-                    //                     className="underline"
-                    //                 >
-                    //                     Link
-                    //                 </a>
-                    //             </>
-                    //         ),
-                    //         type: 'assistant',
-                    //     },
-                    // ]);
+                    const trxData = await trxCaller(
+                        4.0e15,
+                        '0x8411CbB1e7d1ed5450e07571cEC04254E490A2D2',
+                        userInfo.uid
+                    );
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: String(prev.length + 1),
+                            content: (
+                                <>
+                                    Payment successful!{' '}
+                                    <a
+                                        href={`https://sepolia.basescan.org/tx/${trxData.data}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="underline"
+                                    >
+                                        Link
+                                    </a>
+                                </>
+                            ),
+                            type: 'assistant',
+                        },
+                    ]);
                     const nextDay = new Date();
                     nextDay.setDate(nextDay.getDate() + 1);
                     const formattedDate = nextDay.toISOString().split('T')[0];
@@ -397,13 +398,17 @@ const YourAgent = () => {
                     setIsLoading(false);
                 }
             } else {
-                formData.append('text', value);
-                formData.append('user', 'user');
                 const res = await fetch(
-                    'https://8c17-2405-201-4024-580a-c16c-b6b1-e4e9-136d.ngrok-free.app/0def601a-8a2b-0c36-936c-9a56c89e88b2/message',
+                    'https://orion-eliza-production.up.railway.app/api/knowledge-base/query',
                     {
                         method: 'POST',
-                        body: formData,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: userInfo.dynamicId,
+                            question: value,
+                        }),
                     }
                 );
 
@@ -412,11 +417,12 @@ const YourAgent = () => {
                 }
 
                 const data = await res.json();
+
                 setMessages((prev) => [
                     ...prev,
                     {
                         id: String(prev.length + 1),
-                        content: data[0].text,
+                        content: data,
                         type: 'assistant',
                     },
                 ]);
