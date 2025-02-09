@@ -308,13 +308,15 @@ const YourAgent = () => {
                 setIsLoading(false);
             } else if (doctorsAppointment) {
                 const res = await googleContacts();
-                const filteredContacts = res.filter((contact: any) =>
-                    contact.emailAddresses?.some((email: any) => {
+                const filteredContacts = res.filter((contact: any) => {
+                    console.log(contact);
+                    return contact.emailAddresses?.some((email: any) => {
+                        console.log(email);
                         return value
                             .toLowerCase()
                             .includes(email.value.toLowerCase());
-                    })
-                );
+                    });
+                });
                 console.log(filteredContacts);
                 if (
                     filteredContacts.length > 0 &&
