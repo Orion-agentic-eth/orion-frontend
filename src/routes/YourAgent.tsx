@@ -315,6 +315,7 @@ const YourAgent = () => {
                             .includes(email.value.toLowerCase());
                     })
                 );
+                console.log(filteredContacts);
                 if (
                     filteredContacts.length > 0 &&
                     filteredContacts[0]?.emailAddresses?.length > 0
