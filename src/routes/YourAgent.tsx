@@ -84,7 +84,7 @@ const YourAgent = () => {
             setValue('');
             const isScheduleRequest =
                 /schedule|book.*call|meeting|appointment/i.test(value);
-            const doctorsAppointment = /add/i.test(value);
+            const doctorsAppointment = /connect/i.test(value);
             if (isScheduleRequest) {
                 const eventDetails = extractEventDetails(value);
                 const res = await scheduleEvent({
@@ -308,15 +308,13 @@ const YourAgent = () => {
                 setIsLoading(false);
             } else if (doctorsAppointment) {
                 const res = await googleContacts();
+                const lastWord = value.trim().split(' ').pop()?.toLowerCase();
                 const filteredContacts = res.filter((contact: any) => {
                     return contact.emailAddresses?.some((email: any) => {
-                        console.log(email.value);
-                        return email.value
-                            .toLowerCase()
-                            .includes(value.toLowerCase());
+                        return email.value.toLowerCase().includes(lastWord);
                     });
                 });
-                console.log(filteredContacts);
+
                 if (
                     filteredContacts.length > 0 &&
                     filteredContacts[0]?.emailAddresses?.length > 0
